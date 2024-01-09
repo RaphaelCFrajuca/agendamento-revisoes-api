@@ -1,7 +1,7 @@
 import { Body, Controller, Post } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
-import { CreateSchedulerDto } from "src/domain/dto/create-scheduler.dto";
-import { ScheduleService } from "src/domain/services/schedule.service";
+import { CreateSchedulerDto } from "src/domain/scheduler/dtos/scheduler.dto";
+import { ScheduleService } from "src/domain/scheduler/services/schedule.service";
 
 @ApiTags("schedule")
 @Controller("schedule")

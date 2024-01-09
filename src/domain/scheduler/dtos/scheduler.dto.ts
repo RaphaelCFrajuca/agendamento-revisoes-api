@@ -3,7 +3,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
 import { IsDate, IsPhoneNumber, IsString } from "class-validator";
 
-export class CreateSchedulerDto {
+export class SchedulerDto {
     @IsString()
     @ApiProperty({
         description: "Nome do cliente",

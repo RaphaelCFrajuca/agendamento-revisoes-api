@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { ScheduleModule } from "./schedule.module";
+import { ScheduleModule } from "./domain/scheduler/schedule.module";
 
 @Module({
     imports: [ScheduleModule],

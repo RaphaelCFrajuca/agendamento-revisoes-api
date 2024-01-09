@@ -3,7 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as dotenv from "dotenv";
 import "reflect-metadata";
-import { AppModule } from "./modules/app.module";
+import { AppModule } from "./app.module";
 
 async function bootstrap() {
     dotenv.config();
