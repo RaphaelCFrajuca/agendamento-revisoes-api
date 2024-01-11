@@ -1,7 +1,5 @@
-import { BadRequestException } from "@nestjs/common";
 import { ApiProperty } from "@nestjs/swagger";
-import { Transform } from "class-transformer";
-import { IsDate, IsPhoneNumber, IsString } from "class-validator";
+import { IsDate, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
 
 export class SchedulerDto {
     @IsString()
@@ -21,6 +19,16 @@ export class SchedulerDto {
     readonly phone: string;
 
     @IsString()
+    @MinLength(11)
+    @MaxLength(11)
+    @ApiProperty({
+        description: "CPF do cliente",
+        type: String,
+        example: "12345678901",
+    })
+    readonly cpf: string;
+
+    @IsString()
     @ApiProperty({
         description: "Modelo do carro",
         type: String,
@@ -28,21 +36,21 @@ export class SchedulerDto {
     })
     readonly carModel: string;
 
+    @IsString()
+    @MinLength(7)
+    @MaxLength(7)
+    @ApiProperty({
+        description: "Placa do carro",
+        type: String,
+        example: "ABC1234",
+    })
+    readonly carLicensePlate: string;
+
     @IsDate()
     @ApiProperty({
         description: "Data e horário do agendamento nos seguintes formatos: dd/mm/yyyy hh:mm, yyyy/mm/dd hh:mm",
         type: String,
         example: "09/01/2023 10:30",
-    })
-    @Transform(({ value }): Date => {
-        try {
-            const date = new Date(value);
-            date.setHours(date.getHours() - 3);
-            return date;
-        } catch (error) {
-            console.error(error);
-            throw new BadRequestException("Invalid date format");
-        }
     })
     readonly dateTime: Date;
 }
