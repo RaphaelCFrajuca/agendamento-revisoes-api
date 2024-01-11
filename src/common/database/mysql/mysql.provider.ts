@@ -57,6 +57,8 @@ export class MysqlProvider implements IDatabase {
             throw new NotFoundException("Schedule not found");
         }
 
+        schedule.date.setHours(schedule.date.getHours() - 3);
+
         const scheduleDto: SchedulerDto = {
             carLicensePlate: schedule.car.licensePlate,
             carModel: schedule.car.model,
@@ -137,11 +139,44 @@ export class MysqlProvider implements IDatabase {
         }
 
         const actualYear = new Date().getFullYear();
-        console.log(actualYear);
         const schedules = await MysqlProvider.dataSource
             .getRepository(SchedulesEntity)
             .createQueryBuilder("schedule")
             .where("MONTH(schedule.date) = :month AND YEAR(schedule.date) = :year", { year: actualYear, month: month })
+            .getMany();
+
+        return Promise.all(
+            schedules.map(async schedule => {
+                const scheduleDto: SchedulerDto = await this.getSchedule(schedule.id);
+                return scheduleDto;
+            }),
+        );
+    }
+
+    async getSchedulesByWeek(week: number, month: number): Promise<SchedulerDto[]> {
+        if (week < 1 || week > 5 || isNaN(week)) {
+            throw new BadRequestException("Invalid week");
+        }
+
+        if (month < 1 || month > 12 || isNaN(month)) {
+            throw new BadRequestException("Invalid month");
+        }
+
+        const actualYear = new Date().getFullYear();
+        const schedules = await MysqlProvider.dataSource
+            .getRepository(SchedulesEntity)
+            .createQueryBuilder("schedule")
+            .where("YEAR(schedule.date) = :year", { year: actualYear })
+            .andWhere("MONTH(schedule.date) = :month", { month: month })
+            .andWhere(
+                "WEEK(schedule.date, 3) = (SELECT MIN(WEEK(schedules.date, 3)) + :week FROM schedules WHERE YEAR(schedules.date) = :year AND MONTH(schedules.date) = :month)",
+                {
+                    year: actualYear,
+                    month: month,
+                    week: week - 1,
+                },
+            )
+            // AND WEEK(`schedule`.`date`, 3) = (SELECT MIN(WEEK(`date`, 3)) + 2 FROM `schedules` WHERE YEAR(`date`) = @target_year AND MONTH(`date`) = @target_month);
             .getMany();
 
         return Promise.all(
