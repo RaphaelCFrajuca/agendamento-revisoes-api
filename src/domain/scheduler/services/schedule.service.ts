@@ -41,30 +41,59 @@ export class ScheduleService {
         return await this.databaseService.getSchedulesByWeek(week, month);
     }
 
-    getAvaliableDaysToSchedule() {
+    async getAvaliableDaysToSchedule() {
         const actualDate = new Date();
+        const currentHour = actualDate.getHours();
 
-        // gerar array com os dias úteis do mês atual (segunda a sexta) apenas nos horários das 8h às 18h com intervalos de 30 em 30 minutos
-        const days = [];
+        if (currentHour >= 18) {
+            actualDate.setDate(actualDate.getDate() + 1);
+        }
+
+        actualDate.setHours(currentHour < 8 ? 8 : currentHour);
+        actualDate.setMinutes(currentHour < 30 ? 0 : 30);
+        actualDate.setSeconds(0);
+        actualDate.setMilliseconds(0);
+
+        const days: Date[] = [];
         const daysInMonth = new Date(actualDate.getFullYear(), actualDate.getMonth() + 1, 0).getDate();
-        // gerar apenas os dias a partir do dia atual
+
         for (let i = actualDate.getDate(); i <= daysInMonth; i++) {
             const day = new Date(actualDate.getFullYear(), actualDate.getMonth(), i, 8, 0, 0, 0);
             if (day.getDay() > 0 && day.getDay() < 6) {
                 for (let j = 8; j < 18; j++) {
+                    if (i === actualDate.getDate() && j <= currentHour) continue;
                     days.push(new Date(actualDate.getFullYear(), actualDate.getMonth(), i, j, 0, 0));
                     days.push(new Date(actualDate.getFullYear(), actualDate.getMonth(), i, j, 30, 0));
                 }
             }
         }
 
-        // for (let i = 0; i < 30; i++) {
-        //     const day = new Date(actualDate.getFullYear(), actualDate.getMonth(), actualDate.getDate() + i, 8, 0, 0, 0);
-        //     if (day.getDay() > 0 && day.getDay() < 6) {
-        //         days.push(day);
-        //     }
-        // }
+        const schedules = await this.databaseService.getSchedulesByMonth(actualDate.getMonth() + 1);
+        const avaliableDays = [];
+        if (schedules) {
+            for (const day of days) {
+                day.setHours(day.getHours() - 3);
+                let isAvaliable = true;
+                for (const schedule of schedules) {
+                    if (day.getTime() === schedule.dateTime.getTime()) {
+                        isAvaliable = false;
+                        break;
+                    }
+                }
+                if (isAvaliable) {
+                    day.setHours(day.getHours() + 3);
+                    const dayString = day.toLocaleString("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                    });
+                    avaliableDays.push(dayString);
+                }
+            }
+        }
 
-        return days;
+        return avaliableDays;
     }
 }

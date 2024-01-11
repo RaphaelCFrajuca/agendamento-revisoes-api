@@ -24,7 +24,7 @@ export class ScheduleController {
     }
 
     @Get("/avaliable-days")
-    @ApiOperation({ summary: "Listar todos os dias disponíveis para agendamento" })
+    @ApiOperation({ summary: "Listar todos os dias disponíveis para agendamento no mês atual" })
     @ApiResponse({ status: HttpStatus.OK, description: "Dias listados com sucesso" })
     getAvaliableDaysToSchedule() {
         return this.scheduleService.getAvaliableDaysToSchedule();

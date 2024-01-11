@@ -1,4 +1,5 @@
 import { BadRequestException, ConflictException, NotFoundException } from "@nestjs/common";
+import { isValidScheduleDate } from "src/common/utils/validators.utils";
 import { SchedulerDto } from "src/domain/scheduler/dtos/scheduler.dto";
 import { DataSource, EntityNotFoundError } from "typeorm";
 import { IDatabase } from "../interface/database.interface";
@@ -41,9 +42,20 @@ export class MysqlProvider implements IDatabase {
 
         const schedule = new SchedulesEntity();
         schedule.date = schedulerDto.dateTime;
+
+        try {
+            if (!isValidScheduleDate(schedule.date)) {
+                throw new BadRequestException("Invalid date");
+            }
+        } catch (error) {
+            throw error;
+        }
+
         schedule.car = car;
         schedule.customer = customer;
-        return MysqlProvider.dataSource.manager.save(schedule);
+        const scheduleSaved = await MysqlProvider.dataSource.manager.save(schedule);
+        scheduleSaved.date.setHours(scheduleSaved.date.getHours() - 3);
+        return scheduleSaved;
     }
 
     async getSchedule(scheduleId: number): Promise<SchedulerDto> {
