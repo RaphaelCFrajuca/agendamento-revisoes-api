@@ -127,6 +127,27 @@ export class MysqlProvider implements IDatabase {
         }
     }
 
+    async getSchedulesByMonth(month: number): Promise<SchedulerDto[]> {
+        if (month < 1 || month > 12 || isNaN(month)) {
+            throw new BadRequestException("Invalid month");
+        }
+
+        const actualYear = new Date().getFullYear();
+        console.log(actualYear);
+        const schedules = await MysqlProvider.dataSource
+            .getRepository(SchedulesEntity)
+            .createQueryBuilder("schedule")
+            .where("MONTH(schedule.date) = :month AND YEAR(schedule.date) = :year", { year: actualYear, month: month })
+            .getMany();
+
+        return Promise.all(
+            schedules.map(async schedule => {
+                const scheduleDto: SchedulerDto = await this.getSchedule(schedule.id);
+                return scheduleDto;
+            }),
+        );
+    }
+
     async deleteSchedule(scheduleId: number) {
         const deleteRow = await MysqlProvider.dataSource.manager.delete(SchedulesEntity, scheduleId);
         if (!deleteRow.affected) {

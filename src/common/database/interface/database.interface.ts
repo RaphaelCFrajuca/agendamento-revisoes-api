@@ -5,6 +5,7 @@ export interface IDatabase {
     getSchedule(scheduleId: number);
     getAllSchedules();
     getSchedulesByLicensePlate(carLicensePlate: string);
+    getSchedulesByMonth(month: number);
     getSchedulesByCpf(cpf: string);
     deleteSchedule(scheduleId: number);
     updateSchedule(scheduleId: number, schedule: SchedulerDto);

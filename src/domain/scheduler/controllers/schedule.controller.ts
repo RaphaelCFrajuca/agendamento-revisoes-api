@@ -27,6 +27,7 @@ export class ScheduleController {
     @ApiOperation({ summary: "Deletar um agendamento" })
     @ApiResponse({ status: HttpStatus.NO_CONTENT, description: "Agendamento deletado com sucesso" })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Agendamento não encontrado" })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "ID do agendamento inválido" })
     async deleteScheduler(@Param("id") id: number, @Res() res) {
         await this.scheduleService.deleteSchedule(id);
         res.status(HttpStatus.NO_CONTENT).send();
@@ -36,6 +37,7 @@ export class ScheduleController {
     @ApiOperation({ summary: "Atualizar um agendamento" })
     @ApiResponse({ status: HttpStatus.OK, description: "Agendamento atualizado com sucesso" })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Agendamento não encontrado" })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "ID do agendamento inválido" })
     async updateScheduler(@Param("id") id: number, @Body() schedulerDto: SchedulerDto, @Res() res) {
         await this.scheduleService.updateSchedule(id, schedulerDto);
         res.status(HttpStatus.OK).send();
@@ -65,5 +67,14 @@ export class ScheduleController {
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "CPF inválido" })
     async getSchedulesByCpf(@Param("cpf") cpf: string) {
         return await this.scheduleService.getSchedulesByCpf(cpf);
+    }
+
+    @Get("/month/:month")
+    @ApiOperation({ summary: "Buscar agendamentos por mês com base no ano anual" })
+    @ApiResponse({ status: HttpStatus.OK, description: "Agendamentos encontrados com sucesso" })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Agendamentos não encontrados" })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Mês inválido" })
+    async getSchedulesByMonth(@Param("month") month: number) {
+        return await this.scheduleService.getSchedulesByMonth(month);
     }
 }

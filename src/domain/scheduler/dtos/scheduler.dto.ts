@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+import { Transform } from "class-transformer";
 import { IsDate, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
 
 export class SchedulerDto {
@@ -47,8 +48,21 @@ export class SchedulerDto {
     readonly carLicensePlate: string;
 
     @IsDate()
+    // converter data no formato mm/dd/yyyy para dd/mm/yyyy
+    // https://stackoverflow.com/questions/5129624/convert-js-date-time-to-mysql-datetime
+    @Transform(({ value }) => {
+        const date = new Date(value);
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const year = date.getFullYear();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const newDate = new Date(`${day}/${month}/${year} ${hours}:${minutes}`);
+        console.log(newDate);
+        return newDate;
+    })
     @ApiProperty({
-        description: "Data e horário do agendamento nos seguintes formatos: dd/mm/yyyy hh:mm, yyyy/mm/dd hh:mm",
+        description: "Data e horário do agendamento nos seguintes formatos: dd/mm/yyyy hh:mm",
         type: String,
         example: "09/01/2023 10:30",
     })

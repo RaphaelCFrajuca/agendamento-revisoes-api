@@ -32,4 +32,8 @@ export class ScheduleService {
     async getSchedulesByCpf(cpf: string): Promise<SchedulerDto[]> {
         return await this.databaseService.getSchedulesByCpf(cpf);
     }
+
+    async getSchedulesByMonth(month: number): Promise<SchedulerDto[]> {
+        return await this.databaseService.getSchedulesByMonth(month);
+    }
 }
