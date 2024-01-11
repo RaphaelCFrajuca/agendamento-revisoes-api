@@ -279,9 +279,4 @@ export class MysqlProvider implements IDatabase {
 
         return MysqlProvider.dataSource.isInitialized ? MysqlProvider.dataSource : MysqlProvider.dataSource.initialize();
     }
-
-    async destroy(): Promise<void> {
-        const mysqlManager = await this.connect();
-        await mysqlManager.destroy();
-    }
 }
