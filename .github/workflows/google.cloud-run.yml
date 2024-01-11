@@ -1,0 +1,66 @@
+name: Deploy to Google Cloud Run
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Cache node_modules
+              uses: actions/cache@v3
+              with:
+                  path: node_modules
+                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 21
+
+            - name: "Auth"
+              uses: "google-github-actions/auth@v1"
+              with:
+                  credentials_json: ${{ secrets.GCLOUD_AUTH }}
+
+            - name: Install dependencies
+              run: npm install
+
+            - name: Build the Nest.js app
+              run: npm run build
+
+            - name: Test the Nest.js app
+              run: npm run test:cov
+
+            - name: SonarCloud Scan
+              uses: sonarsource/sonarcloud-github-action@master
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+            - name: Deploy to Cloud Run
+              id: deploy
+              uses: google-github-actions/deploy-cloudrun@v0
+              with:
+                  service: agendamento-revisoes-api
+                  region: us-central1
+                  source: ./
+                  project_id: ${{ env.PROJECT_ID }}
+                  env_vars: |
+                      DATABASE_PROVIDER=${{ env.DATABASE_PROVIDER }}
+                      MYSQL_HOST=${{ secrets.MYSQL_HOST }}
+                      MYSQL_PORT=${{ secrets.MYSQL_PORT }}
+                      MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}
+                      MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+                      MYSQL_DATABASE_NAME=${{ secrets.MYSQL_DATABASE_NAME }}
+
+            - name: Show URL
+              run: echo ${{ steps.deploy.outputs.url }}
