@@ -1,6 +1,6 @@
-import { ConflictException, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, NotFoundException } from "@nestjs/common";
 import { SchedulerDto } from "src/domain/scheduler/dtos/scheduler.dto";
-import { DataSource } from "typeorm";
+import { DataSource, EntityNotFoundError } from "typeorm";
 import { IDatabase } from "../interface/database.interface";
 import { CarsEntity } from "./entities/cars.entity";
 import { CustomersEntity } from "./entities/customers.entity";
@@ -76,39 +76,55 @@ export class MysqlProvider implements IDatabase {
     }
 
     async getSchedulesByLicensePlate(carLicensePlate: string): Promise<SchedulerDto[]> {
-        const schedules = (
-            await MysqlProvider.dataSource.getRepository(CarsEntity).findOne({
-                where: { licensePlate: carLicensePlate },
-                relations: {
-                    schedules: true,
-                },
-            })
-        ).schedules;
+        try {
+            const schedules = (
+                await MysqlProvider.dataSource.getRepository(CarsEntity).findOneOrFail({
+                    where: { licensePlate: carLicensePlate },
+                    relations: {
+                        schedules: true,
+                    },
+                })
+            ).schedules;
 
-        return Promise.all(
-            schedules.map(async schedule => {
-                const scheduleDto: SchedulerDto = await this.getSchedule(schedule.id);
-                return scheduleDto;
-            }),
-        );
+            return Promise.all(
+                schedules.map(async schedule => {
+                    const scheduleDto: SchedulerDto = await this.getSchedule(schedule.id);
+                    return scheduleDto;
+                }),
+            );
+        } catch (error) {
+            if (error instanceof EntityNotFoundError) {
+                throw new BadRequestException("Invalid license plate");
+            } else {
+                throw error;
+            }
+        }
     }
 
     async getSchedulesByCpf(cpf: string): Promise<SchedulerDto[]> {
-        const schedules = (
-            await MysqlProvider.dataSource.getRepository(CustomersEntity).findOne({
-                where: { cpf: cpf },
-                relations: {
-                    schedules: true,
-                },
-            })
-        ).schedules;
+        try {
+            const schedules = (
+                await MysqlProvider.dataSource.getRepository(CustomersEntity).findOneOrFail({
+                    where: { cpf: cpf },
+                    relations: {
+                        schedules: true,
+                    },
+                })
+            ).schedules;
 
-        return Promise.all(
-            schedules.map(async schedule => {
-                const scheduleDto: SchedulerDto = await this.getSchedule(schedule.id);
-                return scheduleDto;
-            }),
-        );
+            return Promise.all(
+                schedules.map(async schedule => {
+                    const scheduleDto: SchedulerDto = await this.getSchedule(schedule.id);
+                    return scheduleDto;
+                }),
+            );
+        } catch (error) {
+            if (error instanceof EntityNotFoundError) {
+                throw new BadRequestException("Invalid CPF");
+            } else {
+                throw error;
+            }
+        }
     }
 
     async deleteSchedule(scheduleId: number) {
