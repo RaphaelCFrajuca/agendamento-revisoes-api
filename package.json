@@ -64,15 +64,30 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
+    "rootDir": "./",
+    "modulePaths": [
+      "<rootDir>/src"
+    ],
+    "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
+    "testEnvironment": "node",
+    "coverageDirectory": "./coverage",
+    "coverageReporters": [
+      "text-summary",
+      "lcov"
     ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "collectCoverageFrom": [
+      "**/*.ts",
+      "!src/main.ts",
+      "!src/LembreteRemediosModule.ts",
+      "!src/common/database/database.factory.ts",
+      "!src/common/database/interface/database.interface.ts",
+      "!src/common/database/mysql/*.ts",
+      "!dist/**",
+      "!test/**/*.ts",
+      "!node_modules/**"
+    ]
   }
 }
