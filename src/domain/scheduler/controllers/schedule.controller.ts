@@ -77,7 +77,7 @@ export class ScheduleController {
     }
 
     @Get("/month/:month")
-    @ApiOperation({ summary: "Buscar agendamentos por mês com base no ano anual" })
+    @ApiOperation({ summary: "Buscar agendamentos por mês com base no ano atual" })
     @ApiResponse({ status: HttpStatus.OK, description: "Agendamentos encontrados com sucesso" })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Agendamentos não encontrados" })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Mês inválido" })
@@ -86,12 +86,22 @@ export class ScheduleController {
     }
 
     @Get("/month/:month/week/:week")
-    @ApiOperation({ summary: "Buscar agendamentos por semana com base no ano anual" })
+    @ApiOperation({ summary: "Buscar agendamentos por semana com base no ano atual" })
     @ApiResponse({ status: HttpStatus.OK, description: "Agendamentos encontrados com sucesso" })
     @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Agendamentos não encontrados" })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Semana inválida" })
     @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Mês inválido" })
     async getSchedulesByWeek(@Param("week") week: number, @Param("month") month: number) {
         return await this.scheduleService.getSchedulesByWeek(week, month);
+    }
+
+    @Get("/month/:month/day/:day")
+    @ApiOperation({ summary: "Buscar agendamentos por dia com base no ano atual" })
+    @ApiResponse({ status: HttpStatus.OK, description: "Agendamentos encontrados com sucesso" })
+    @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Agendamentos não encontrados" })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Dia inválido" })
+    @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Mês inválido" })
+    async getSchedulesByDay(@Param("day") day: number, @Param("month") month: number) {
+        return await this.scheduleService.getSchedulesByDay(day, month);
     }
 }

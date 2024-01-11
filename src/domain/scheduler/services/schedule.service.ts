@@ -41,6 +41,10 @@ export class ScheduleService {
         return await this.databaseService.getSchedulesByWeek(week, month);
     }
 
+    async getSchedulesByDay(day: number, month: number): Promise<SchedulerDto[]> {
+        return await this.databaseService.getSchedulesByDay(day, month);
+    }
+
     async getAvaliableDaysToSchedule() {
         const actualDate = new Date();
         const currentHour = actualDate.getHours();

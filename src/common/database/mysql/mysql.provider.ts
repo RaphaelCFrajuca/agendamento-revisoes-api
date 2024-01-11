@@ -188,7 +188,33 @@ export class MysqlProvider implements IDatabase {
                     week: week - 1,
                 },
             )
-            // AND WEEK(`schedule`.`date`, 3) = (SELECT MIN(WEEK(`date`, 3)) + 2 FROM `schedules` WHERE YEAR(`date`) = @target_year AND MONTH(`date`) = @target_month);
+            .getMany();
+
+        return Promise.all(
+            schedules.map(async schedule => {
+                const scheduleDto: SchedulerDto = await this.getSchedule(schedule.id);
+                return scheduleDto;
+            }),
+        );
+    }
+
+    async getSchedulesByDay(day: number, month: number) {
+        if (month < 1 || month > 12 || isNaN(month)) {
+            throw new BadRequestException("Invalid month");
+        }
+
+        if (day < 1 || day > 31 || isNaN(day)) {
+            throw new BadRequestException("Invalid day");
+        }
+
+        const actualYear = new Date().getFullYear();
+        // obter todos os agendamentos do dia desde 00:00 até 23:59
+        const schedules = await MysqlProvider.dataSource
+            .getRepository(SchedulesEntity)
+            .createQueryBuilder("schedule")
+            .where("YEAR(schedule.date) = :year", { year: actualYear })
+            .andWhere("MONTH(schedule.date) = :month", { month: month })
+            .andWhere("DAY(schedule.date) = :day", { day: day })
             .getMany();
 
         return Promise.all(
