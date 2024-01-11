@@ -48,14 +48,14 @@ jobs:
 
             - name: Deploy to Cloud Run
               id: deploy
-              uses: google-github-actions/deploy-cloudrun@v0
+              uses: "google-github-actions/deploy-cloudrun@v2"
               with:
                   service: agendamento-revisoes-api
                   region: us-central1
                   source: ./
-                  project_id: ${{ env.PROJECT_ID }}
+                  project_id: ${{ vars.PROJECT_ID }}
                   env_vars: |
-                      DATABASE_PROVIDER=${{ env.DATABASE_PROVIDER }}
+                      DATABASE_PROVIDER=${{ vars.DATABASE_PROVIDER }}
                       MYSQL_HOST=${{ secrets.MYSQL_HOST }}
                       MYSQL_PORT=${{ secrets.MYSQL_PORT }}
                       MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}
