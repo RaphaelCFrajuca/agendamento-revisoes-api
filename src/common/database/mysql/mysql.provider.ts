@@ -49,6 +49,10 @@ export class MysqlProvider implements IDatabase {
     async getSchedule(scheduleId: number): Promise<SchedulerDto> {
         const schedule = await MysqlProvider.dataSource.getRepository(SchedulesEntity).findOne({ where: { id: scheduleId }, relations: ["car", "customer"] });
 
+        if (isNaN(scheduleId) || scheduleId < 1) {
+            throw new BadRequestException("Invalid schedule id");
+        }
+
         if (!schedule) {
             throw new NotFoundException("Schedule not found");
         }
@@ -149,6 +153,10 @@ export class MysqlProvider implements IDatabase {
     }
 
     async deleteSchedule(scheduleId: number) {
+        if (isNaN(scheduleId) || scheduleId < 1) {
+            throw new BadRequestException("Invalid schedule id");
+        }
+
         const deleteRow = await MysqlProvider.dataSource.manager.delete(SchedulesEntity, scheduleId);
         if (!deleteRow.affected) {
             throw new NotFoundException("Schedule not found");
@@ -156,6 +164,10 @@ export class MysqlProvider implements IDatabase {
     }
 
     async updateSchedule(scheduleId: number, schedule: SchedulerDto) {
+        if (isNaN(scheduleId) || scheduleId < 1) {
+            throw new BadRequestException("Invalid schedule id");
+        }
+
         const car = await MysqlProvider.dataSource.getRepository(CarsEntity).findOne({ where: { licensePlate: schedule.carLicensePlate } });
         if (!car) {
             throw new NotFoundException("Car not found");
