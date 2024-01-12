@@ -28,6 +28,7 @@ describe("ScheduleService (unit)", () => {
             getSchedulesByDay: jest.fn(),
             getSchedulesByWeek: jest.fn(),
             getSchedulesByMonth: jest.fn(),
+            connect: jest.fn(),
         };
 
         const module: TestingModule = await Test.createTestingModule({
@@ -151,6 +152,15 @@ describe("ScheduleService (unit)", () => {
 
         it("should return a list of avaliable days to schedule", async () => {
             jest.useFakeTimers().setSystemTime(new Date("2021-08-10T10:00:00.000Z").getTime());
+
+            jest.spyOn(mockDatabaseService, "getSchedulesByMonth").mockImplementation(async () => [scheduleDtoValid]);
+
+            const result = await service.getAvaliableDaysToSchedule();
+            expect(result).not.toContain("10/08/2021, 10:30");
+            expect(mockDatabaseService.getSchedulesByMonth).toHaveBeenCalledWith(8);
+        });
+        it("should return a list of avaliable days to schedule when the hour in actual day is + 18hrs", async () => {
+            jest.useFakeTimers().setSystemTime(new Date("2021-08-10T22:00:00.000Z").getTime());
 
             jest.spyOn(mockDatabaseService, "getSchedulesByMonth").mockImplementation(async () => [scheduleDtoValid]);
 

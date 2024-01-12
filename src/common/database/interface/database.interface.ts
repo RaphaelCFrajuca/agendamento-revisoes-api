@@ -1,6 +1,7 @@
 import { SchedulerDto } from "src/domain/scheduler/dtos/scheduler.dto";
 
 export interface IDatabase {
+    connect();
     createSchedule(schedule: SchedulerDto);
     getSchedule(scheduleId: number);
     getAllSchedules();

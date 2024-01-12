@@ -32,6 +32,7 @@
     "npm": "^10.2.5",
     "reflect-metadata": "^0.1.14",
     "rxjs": "^7.8.1",
+    "sqlite3": "^5.1.7",
     "swagger-ui-express": "^5.0.0",
     "typeorm": "^0.3.19"
   },
@@ -81,8 +82,11 @@
     "collectCoverageFrom": [
       "**/*.ts",
       "!src/main.ts",
-      "!src/LembreteRemediosModule.ts",
+      "!src/app.module.ts",
+      "!src/common/guards/*.ts",
+      "!src/common/environment/*.ts",
       "!src/common/database/database.factory.ts",
+      "!src/common/database/database.module.ts",
       "!src/common/database/interface/database.interface.ts",
       "!src/common/database/mysql/*.ts",
       "!dist/**",

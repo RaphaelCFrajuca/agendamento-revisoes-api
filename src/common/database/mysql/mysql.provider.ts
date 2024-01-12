@@ -9,11 +9,7 @@ import { SchedulesEntity } from "./entities/schedules.entity";
 import { MysqlConfig } from "./interface/mysql-config.interface";
 
 export class MysqlProvider implements IDatabase {
-    constructor(private readonly mysqlConfig: MysqlConfig) {
-        (async () => {
-            await this.connect();
-        })();
-    }
+    constructor(private readonly mysqlConfig: MysqlConfig) {}
 
     protected static dataSource: DataSource;
 
@@ -245,16 +241,18 @@ export class MysqlProvider implements IDatabase {
         if (!car) {
             throw new NotFoundException("Car not found");
         }
+        await MysqlProvider.dataSource.manager.update(CarsEntity, car.id, { ...car, model: schedule.carModel, licensePlate: schedule.carLicensePlate });
 
         const customer = await MysqlProvider.dataSource.getRepository(CustomersEntity).findOne({ where: { cpf: schedule.cpf } });
         if (!customer) {
             throw new NotFoundException("Customer not found");
         }
+        await MysqlProvider.dataSource.manager.update(CustomersEntity, customer.id, { ...customer, name: schedule.name, cpf: schedule.cpf, phone: schedule.phone });
 
         const newSchedule = new SchedulesEntity();
         newSchedule.date = schedule.dateTime;
-        newSchedule.car = car;
-        newSchedule.customer = customer;
+        newSchedule.car = { ...car, model: schedule.carModel, licensePlate: schedule.carLicensePlate };
+        newSchedule.customer = { ...customer, name: schedule.name, cpf: schedule.cpf, phone: schedule.phone };
 
         const updateRow = await MysqlProvider.dataSource.manager.update(SchedulesEntity, scheduleId, newSchedule);
         if (!updateRow.affected) {
@@ -262,7 +260,7 @@ export class MysqlProvider implements IDatabase {
         }
     }
 
-    private async connect() {
+    connect = async () => {
         if (!MysqlProvider.dataSource) {
             MysqlProvider.dataSource = new DataSource({
                 type: "mysql",
@@ -277,6 +275,7 @@ export class MysqlProvider implements IDatabase {
             });
         }
 
-        return MysqlProvider.dataSource.isInitialized ? MysqlProvider.dataSource : MysqlProvider.dataSource.initialize();
-    }
+        MysqlProvider.dataSource.isInitialized ? MysqlProvider.dataSource : await MysqlProvider.dataSource.initialize();
+        return this;
+    };
 }

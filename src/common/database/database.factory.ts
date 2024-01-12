@@ -3,13 +3,13 @@ import { IDatabase } from "./interface/database.interface";
 import { MysqlConfig } from "./mysql/interface/mysql-config.interface";
 import { MysqlProvider } from "./mysql/mysql.provider";
 
-export function databaseFactory(databaseProvider: DatabaseEnum, mysqlConfig: MysqlConfig): IDatabase {
+export async function databaseFactory(databaseProvider: DatabaseEnum, mysqlConfig: MysqlConfig): Promise<IDatabase> {
     switch (databaseProvider) {
         case DatabaseEnum.MYSQL:
-            return new MysqlProvider(mysqlConfig);
+            return await new MysqlProvider(mysqlConfig).connect();
         case DatabaseEnum.MONGODB:
-            return new MysqlProvider(mysqlConfig);
+            return await new MysqlProvider(mysqlConfig).connect();
         default:
-            return new MysqlProvider(mysqlConfig);
+            return await new MysqlProvider(mysqlConfig).connect();
     }
 }
