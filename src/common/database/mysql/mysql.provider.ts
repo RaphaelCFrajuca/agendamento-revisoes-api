@@ -55,11 +55,11 @@ export class MysqlProvider implements IDatabase {
     }
 
     async getSchedule(scheduleId: number): Promise<SchedulerDto> {
-        const schedule = await MysqlProvider.dataSource.getRepository(SchedulesEntity).findOne({ where: { id: scheduleId }, relations: ["car", "customer"] });
-
         if (isNaN(scheduleId) || scheduleId < 1) {
             throw new BadRequestException("Invalid schedule id");
         }
+
+        const schedule = await MysqlProvider.dataSource.getRepository(SchedulesEntity).findOne({ where: { id: scheduleId }, relations: ["car", "customer"] });
 
         if (!schedule) {
             throw new NotFoundException("Schedule not found");
