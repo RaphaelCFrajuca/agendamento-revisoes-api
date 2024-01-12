@@ -66,14 +66,14 @@
     ],
     "rootDir": "./",
     "modulePaths": [
-      "<rootDir>/src"
+      "<rootDir>"
     ],
     "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "testEnvironment": "node",
     "coverageDirectory": "./coverage",
+    "testEnvironment": "node",
     "coverageReporters": [
       "text-summary",
       "lcov"
