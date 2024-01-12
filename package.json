@@ -87,6 +87,7 @@
       "!src/common/environment/*.ts",
       "!src/common/database/database.factory.ts",
       "!src/common/database/database.module.ts",
+      "!src/domain/scheduler/scheduler.module.ts",
       "!src/common/database/interface/database.interface.ts",
       "!src/common/database/mysql/*.ts",
       "!dist/**",
