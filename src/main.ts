@@ -20,6 +20,11 @@ async function bootstrap() {
         .setTitle("Agendamento de Revisões")
         .setDescription("API REST para Agendamento de Revisões em Oficina de Carros")
         .setVersion("1.0")
+        .addBearerAuth({
+            type: "http",
+            description: "Bearer token do administrador",
+            name: "Authorization",
+        })
         .build();
 
     const document = SwaggerModule.createDocument(app, options);

@@ -48,6 +48,11 @@ export class SchedulerDto {
     readonly carLicensePlate: string;
 
     @IsDate()
+    @ApiProperty({
+        description: "Data e hora do agendamento",
+        type: Date,
+        example: "10/08/2021 10:00",
+    })
     @Transform(({ value }) => {
         const [datePart, timePart] = value.split(" ");
         const [day, month, year] = datePart.split("/");

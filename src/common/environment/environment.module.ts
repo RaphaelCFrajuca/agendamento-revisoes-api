@@ -19,7 +19,11 @@ import { MysqlConfig } from "../database/mysql/interface/mysql-config.interface"
                 database: process.env.MYSQL_DATABASE_NAME,
             } as MysqlConfig,
         },
+        {
+            provide: "MANAGER_TOKEN",
+            useValue: process.env.MANAGER_TOKEN,
+        },
     ],
-    exports: ["DATABASE_PROVIDER", "MYSQL_CONFIG"],
+    exports: ["DATABASE_PROVIDER", "MYSQL_CONFIG", "MANAGER_TOKEN"],
 })
 export class EnvironmentModule {}
