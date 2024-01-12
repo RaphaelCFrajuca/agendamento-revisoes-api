@@ -275,7 +275,9 @@ export class MysqlProvider implements IDatabase {
             });
         }
 
-        MysqlProvider.dataSource.isInitialized ? MysqlProvider.dataSource : await MysqlProvider.dataSource.initialize();
+        if (!MysqlProvider.dataSource.isInitialized) {
+            await MysqlProvider.dataSource.initialize();
+        }
         return this;
     };
 }
